@@ -10,15 +10,19 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.2.9",
+    "d3-scale": "^4.0.2",
     "framer-motion": "^11.0.8",
     "next": "14.1.1",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-simple-maps": "^3.0.0"
   },
   "devDependencies": {
+    "@types/d3-scale": "^4.0.8",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-simple-maps": "^3.0.4",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.1",
