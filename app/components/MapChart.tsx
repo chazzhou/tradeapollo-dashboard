@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import Map, { Source, Layer } from 'react-map-gl';
-import { dataLayer } from './map-style';
+import { countiesLayer, highlightLayer } from './map-style';
 import { hasFlag } from 'country-flag-icons'
 import * as flags from 'country-flag-icons/react/3x2';
 
@@ -24,32 +24,13 @@ interface MapChartProps {
   year: number;
 }
 
-const MAP_STYLE = {
-  version: 8,
-  sources: {},
-  layers: [],
-  glyphs: 'fonts/{fontstack}/{range}.pbf',
-};
-
 const mapData = "/world.geojson";
-
-const tooltipText = (data: any) => {
-  if (!data) {
-    return "No data";
-  }
-  return (
-    <div>
-      <div>
-        <strong>{data["Country/Region"]}</strong>
-      </div>
-      <div>{data.Data ? `${data.Data} ${data.unit || ""}` : "No data"}</div>
-    </div>
-  );
-};
 
 const MapChart: React.FC<MapChartProps> = ({ year }) => {
   const [data, setData] = React.useState([]);
-  const [hoverInfo, setHoverInfo] = React.useState(null);
+  const [hoverInfo, setHoverInfo] = React.useState<any>(null);
+  const selectedElectricityZone = (hoverInfo && hoverInfo.feature.properties.zoneName) || '';
+  const filter = useMemo(() => ['==', ['get', 'zoneName'], selectedElectricityZone], [selectedElectricityZone]);
 
   useEffect(() => {
     fetch(`/co2_data/${year}.json`)
@@ -75,10 +56,9 @@ const MapChart: React.FC<MapChartProps> = ({ year }) => {
     const hoveredFeature = features && features[0];
 
     // prettier-ignore
-    setHoverInfo(hoveredFeature && {feature: hoveredFeature, x, y});
+    setHoverInfo(hoveredFeature && {feature: hoveredFeature, x, y, 
+                                    countyName: hoveredFeature.properties.countryKey});
   }, []);
-
-  console.log(hoverInfo);
 
   return (
     <Map
@@ -89,11 +69,12 @@ const MapChart: React.FC<MapChartProps> = ({ year }) => {
       }}
       mapStyle="mapbox://styles/mapbox/light-v9"
       mapboxAccessToken={MAPBOX_TOKEN}
-      interactiveLayerIds={['data']}
+      interactiveLayerIds={['counties']}
       onMouseMove={onHover}
     >
       <Source type="geojson" data={mapData}>
-        <Layer {...dataLayer} />
+        <Layer {...countiesLayer} />
+        <Layer beforeId="waterway-label" {...highlightLayer} filter={filter} />
       </Source>
       {hoverInfo && (
         <div className="tooltip" style={{left: (hoverInfo as any).x, top: (hoverInfo as any).y}}>
