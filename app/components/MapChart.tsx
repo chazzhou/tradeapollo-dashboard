@@ -1,17 +1,21 @@
 import React, { useEffect } from "react";
-import { scaleLinear } from "d3-scale";
-import { ComposableMap, Geographies, Geography, Graticule, ZoomableGroup } from "react-simple-maps";
-import { Tooltip } from "@nextui-org/react";
+import Map, { Source, Layer } from 'react-map-gl';
+import { dataLayer } from './map-style';
 
-const geoUrl = "/word_features.json";
-
-const colorScale = scaleLinear<string>()
-  .domain([0, 75])
-  .range(["#ffedea", "#ff5233"] as const);
+const MAPBOX_TOKEN = 'pk.eyJ1Ijoic3p6aHkwMSIsImEiOiJjbHRvdTE4czcwMzhlMmlxb3piN3AyMWRrIn0.Eofj6S2YRnai_qpFhW20Wg'; // Set your mapbox token here
 
 interface MapChartProps {
   year: number;
 }
+
+const MAP_STYLE = {
+  version: 8,
+  sources: {},
+  layers: [],
+  glyphs: 'fonts/{fontstack}/{range}.pbf',
+};
+
+const mapData = "/world.geojson";
 
 const tooltipText = (data: any) => {
   if (!data) {
@@ -47,30 +51,20 @@ const MapChart: React.FC<MapChartProps> = ({ year }) => {
   }, [year]);
 
   return (
-    <div className="w-full h-full">
-      <ComposableMap className="w-full h-full">
-        <ZoomableGroup center={[10, 50]} zoom={6}>
-          <Graticule stroke="#EAEAEC" strokeWidth={0.2} />
-          <Geographies geography={geoUrl}>
-            {({ geographies }) =>
-              geographies.map((geo) => {
-                const cd: any = data.find((country: any) => country.iso === geo.id);
-                return (
-                  <Tooltip key={geo.rsmKey} content={tooltipText(cd)}>
-                    <Geography
-                      geography={geo}
-                      fill={cd?.Data ? colorScale(Number(cd.Data)) : "#F5F4F6"}
-                      stroke="#EAEAEC"
-                      strokeWidth={0.5}
-                    />
-                  </Tooltip>
-                );
-              })
-            }
-          </Geographies>
-        </ZoomableGroup>
-      </ComposableMap>
-    </div>
+    <Map
+      initialViewState={{
+        latitude: 40,
+        longitude: -100,
+        zoom: 3
+      }}
+      mapStyle="mapbox://styles/mapbox/light-v9"
+      mapboxAccessToken={MAPBOX_TOKEN}
+      interactiveLayerIds={['data']}
+    >
+      <Source type="geojson" data={mapData}>
+        <Layer {...dataLayer} />
+      </Source>
+    </Map>
   );
 };
 

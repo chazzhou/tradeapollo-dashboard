@@ -2,6 +2,7 @@
 import { useState } from "react";
 import MapChart from "./components/MapChart";
 import { Card, Slider } from "@nextui-org/react";
+import ElectricitySearch from "./components/ElectricitySearch";
 
 export default function Home() {
   const [year, setYear] = useState(2020);
@@ -21,11 +22,12 @@ export default function Home() {
           onChangeEnd={(value: number | number[]) => setYear(value as number)}
         />
         <div className="w-full">
-          <Card className="h-auto">
-            <div className="aspect-w-16 aspect-h-9">
+          <Card className="h-96">
               <MapChart year={year} />
-            </div>
           </Card>
+        </div>
+        <div className="my-8">
+          <ElectricitySearch />
         </div>
       </div>
     </main>
