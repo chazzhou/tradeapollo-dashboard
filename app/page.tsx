@@ -23,7 +23,7 @@ export default function Home() {
           <FaArrowUp />
         </Button>
       </div>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="5xl">
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="5xl" placement="center">
         <ModalContent>
           <ModalHeader>Residential Electricity Prices</ModalHeader>
           <ModalBody className="flex justify-center items-center">
@@ -31,8 +31,8 @@ export default function Home() {
           </ModalBody>
         </ModalContent>
       </Modal>
-      <div className="absolute bottom-4 left-4 z-30">
-        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white-300 opacity-50 hover:opacity-100 transition-opacity duration-300">
+      <div className="absolute bottom-3 left-28 z-30">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold opacity-50 hover:opacity-100 transition-opacity duration-300">
           TradeApollo
         </h1>
       </div>

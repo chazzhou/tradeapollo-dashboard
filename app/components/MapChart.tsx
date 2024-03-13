@@ -1,5 +1,11 @@
 import React, { useCallback, useRef, useMemo } from "react";
-import Map, { MapRef, Source, Layer } from 'react-map-gl';
+import Map, {
+  MapRef, Source, Layer,
+  NavigationControl,
+  FullscreenControl,
+  ScaleControl,
+  GeolocateControl
+} from 'react-map-gl';
 import { countiesLayer, highlightLayer } from './map-style';
 import { hasFlag } from 'country-flag-icons'
 import * as flags from 'country-flag-icons/react/3x2';
@@ -30,9 +36,9 @@ const MapChart: React.FC = () => {
   const [clickedFeature, setClickedFeature] = React.useState<any>(null);
 
   const onHover = useCallback((event: any) => {
-    const { features, point: {x, y} } = event;
+    const { features, point: { x, y } } = event;
     const hoveredFeature = features && features[0]; // prettier-ignore
-    setHoverInfo(hoveredFeature && {feature: hoveredFeature, x, y, countyName: hoveredFeature.properties.countryKey});
+    setHoverInfo(hoveredFeature && { feature: hoveredFeature, x, y, countyName: hoveredFeature.properties.countryKey });
   }, []);
 
   const onClick = useCallback((event: any) => {
@@ -53,7 +59,7 @@ const MapChart: React.FC = () => {
             [minLng, minLat],
             [maxLng, maxLat]
           ],
-          {padding: 40, duration: 1000}
+          { padding: 40, duration: 1000 }
         );
       }
     }
@@ -81,11 +87,15 @@ const MapChart: React.FC = () => {
           onClick={onClick}
         >
           <Source type="geojson" data={mapData}>
+          <GeolocateControl position="top-left" />
+          <FullscreenControl position="top-left" />
+          <NavigationControl position="top-left" />
+          <ScaleControl />
             <Layer {...countiesLayer} />
             <Layer beforeId="waterway-label" {...highlightLayer} filter={filter} />
           </Source>
           {hoverInfo && (
-            <div className="tooltip" style={{left: (hoverInfo as any).x, top: (hoverInfo as any).y}}>
+            <div className="tooltip" style={{ left: (hoverInfo as any).x, top: (hoverInfo as any).y }}>
               <div className="flex flex-row justify-start space-x-1 items-center">
                 {hasFlag((hoverInfo as any).feature.properties.countryKey) && (
                   <CountryFlag
