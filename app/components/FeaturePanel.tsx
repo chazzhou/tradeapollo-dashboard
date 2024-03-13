@@ -13,14 +13,6 @@ const FeaturePanel: React.FC<FeaturePanelProps> = ({ feature, onClose }) => {
     const [priceData, setPriceData] = useState([]);
     const [selectedDate, setSelectedDate] = useState('');
 
-    useEffect(() => {
-        if (feature) {
-            const currentDate = new Date().toISOString().split('T')[0];
-            setSelectedDate(currentDate);
-            fetchPriceData(currentDate);
-        }
-    }, [feature]);
-
     const fetchPriceData = async (date: string) => {
         try {
             const response = await fetch(
@@ -32,6 +24,14 @@ const FeaturePanel: React.FC<FeaturePanelProps> = ({ feature, onClose }) => {
             console.error('Error fetching price data:', error);
         }
     };
+    
+    useEffect(() => {
+        if (feature) {
+            const currentDate = new Date().toISOString().split('T')[0];
+            setSelectedDate(currentDate);
+            fetchPriceData(currentDate);
+        }
+    }, [feature]);
 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedDate = e.target.value;

@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useMemo } from "react";
-import Map, { Source, Layer } from 'react-map-gl';
+import React, { useCallback, useRef, useMemo } from "react";
+import Map, { MapRef, Source, Layer } from 'react-map-gl';
 import { countiesLayer, highlightLayer } from './map-style';
 import { hasFlag } from 'country-flag-icons'
 import * as flags from 'country-flag-icons/react/3x2';
 import { AnimatePresence } from 'framer-motion';
 import FeaturePanel from "./FeaturePanel";
+import * as turf from '@turf/turf'
 
 interface CountryFlagProps extends React.ComponentProps<'div'> {
   countryCode: string;
@@ -22,6 +23,7 @@ const MAPBOX_TOKEN = 'pk.eyJ1Ijoic3p6aHkwMSIsImEiOiJjbHRvdTE4czcwMzhlMmlxb3piN3A
 const mapData = "/world.geojson";
 
 const MapChart: React.FC = () => {
+  const mapRef = useRef<MapRef>(null);
   const [hoverInfo, setHoverInfo] = React.useState<any>(null);
   const selectedElectricityZone = (hoverInfo && hoverInfo.feature.properties.zoneName) || '';
   const filter = useMemo(() => ['==', ['get', 'zoneName'], selectedElectricityZone], [selectedElectricityZone]);
@@ -40,8 +42,20 @@ const MapChart: React.FC = () => {
     } = event;
     const clickedFeature = features && features[0];
     if (clickedFeature) {
-      console.log("Clicked Feature:", clickedFeature);
       setClickedFeature(clickedFeature);
+
+      // calculate the bounding box of the feature
+      const [minLng, minLat, maxLng, maxLat] = turf.bbox(clickedFeature);
+
+      if (mapRef.current) {
+        mapRef.current.fitBounds(
+          [
+            [minLng, minLat],
+            [maxLng, maxLat]
+          ],
+          {padding: 40, duration: 1000}
+        );
+      }
     }
   }, []);
 
@@ -53,6 +67,7 @@ const MapChart: React.FC = () => {
     <>
       <div style={{ height: '100%', width: '100%' }}>
         <Map
+          ref={mapRef}
           initialViewState={{
             latitude: 48,
             longitude: 15,
