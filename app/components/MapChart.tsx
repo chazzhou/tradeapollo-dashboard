@@ -3,6 +3,8 @@ import Map, { Source, Layer } from 'react-map-gl';
 import { countiesLayer, highlightLayer } from './map-style';
 import { hasFlag } from 'country-flag-icons'
 import * as flags from 'country-flag-icons/react/3x2';
+import { AnimatePresence } from 'framer-motion';
+import FeaturePanel from "./FeaturePanel";
 
 interface CountryFlagProps extends React.ComponentProps<'div'> {
   countryCode: string;
@@ -31,6 +33,8 @@ const MapChart: React.FC<MapChartProps> = ({ year }) => {
   const [hoverInfo, setHoverInfo] = React.useState<any>(null);
   const selectedElectricityZone = (hoverInfo && hoverInfo.feature.properties.zoneName) || '';
   const filter = useMemo(() => ['==', ['get', 'zoneName'], selectedElectricityZone], [selectedElectricityZone]);
+  const [clickedElectricityZone, setClickedElectricityZone] = React.useState<any>(null);
+  const [clickedFeature, setClickedFeature] = React.useState<any>(null);
 
   useEffect(() => {
     fetch(`/co2_data/${year}.json`)
@@ -60,7 +64,25 @@ const MapChart: React.FC<MapChartProps> = ({ year }) => {
                                     countyName: hoveredFeature.properties.countryKey});
   }, []);
 
+  const onClick = useCallback((event: any) => {
+    const {
+      features,
+      point: { x, y },
+    } = event;
+    const clickedFeature = features && features[0];
+
+    if (clickedFeature) {
+      console.log("Clicked Feature:", clickedFeature);
+      setClickedFeature(clickedFeature);
+    }
+  }, []);
+
+  const handleClosePanelClick = () => {
+    setClickedFeature(null);
+  };
+
   return (
+    <>
     <Map
       initialViewState={{
         latitude: 48,
@@ -71,6 +93,7 @@ const MapChart: React.FC<MapChartProps> = ({ year }) => {
       mapboxAccessToken={MAPBOX_TOKEN}
       interactiveLayerIds={['counties']}
       onMouseMove={onHover}
+      onClick={onClick}
     >
       <Source type="geojson" data={mapData}>
         <Layer {...countiesLayer} />
@@ -88,6 +111,12 @@ const MapChart: React.FC<MapChartProps> = ({ year }) => {
         </div>
       )}
     </Map>
+    <AnimatePresence>
+        {clickedFeature && (
+          <FeaturePanel feature={clickedFeature} onClose={handleClosePanelClick} />
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

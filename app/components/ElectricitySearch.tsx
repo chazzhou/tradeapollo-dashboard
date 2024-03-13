@@ -75,7 +75,7 @@ export default function ElectricitySearch() {
 
     return (
         <div className="flex flex-col items-center w-full max-w-4xl">
-            <h2 className="text-2xl font-bold mb-4">Electricity Search</h2>
+            <h2 className="text-2xl font-bold mb-4">Residential Electricity Search</h2>
             <div className="flex space-x-4 mb-4">
                 <Select
                     label="Country"
