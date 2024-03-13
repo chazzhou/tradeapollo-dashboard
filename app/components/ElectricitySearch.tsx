@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { Input, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Select, SelectItem, Pagination } from "@nextui-org/react";
-import Image from "next/image";
+import { Image } from "@nextui-org/react";
 
 interface ElectricityData {
     name_and_tariff: string;
@@ -71,7 +71,7 @@ export default function ElectricitySearch() {
         const end = start + rowsPerPage;
 
         return data.slice(start, end);
-    }, [page, data, data.length]);
+    }, [page, data]);
 
     return (
         <div className="flex flex-col items-center w-full max-w-4xl">
