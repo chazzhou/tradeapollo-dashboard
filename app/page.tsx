@@ -1,34 +1,40 @@
 "use client";
-import { useState } from "react";
 import MapChart from "./components/MapChart";
-import { Card, Slider } from "@nextui-org/react";
+import { Button, Modal, useDisclosure, ModalContent, ModalBody, ModalHeader } from "@nextui-org/react";
 import ElectricitySearch from "./components/ElectricitySearch";
+import { FaArrowUp } from "react-icons/fa";
 
 export default function Home() {
-  const [year, setYear] = useState(2020);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen p-4">
-      <div className="flex flex-col items-center w-full max-w-4xl">
-        <h1 className="text-3xl font-bold mb-4">TradeApollo</h1>
-        {/* <Slider
-          size="sm"
-          step={1}
-          label="Year"
-          showSteps={true}
-          maxValue={2020}
-          minValue={1995}
-          defaultValue={2020}
-          className="w-full max-w-md mb-8"
-          onChangeEnd={(value: number | number[]) => setYear(value as number)}
-        /> */}
-        <div className="w-full">
-          <Card className="h-96">
-              <MapChart year={year} />
-          </Card>
-        </div>
-        <div className="my-8">
-          <ElectricitySearch />
-        </div>
+    <main className="relative min-h-screen">
+      <div className="absolute inset-0">
+        <MapChart />
+      </div>
+      <div className="absolute bottom-10 left-0 right-0 flex justify-center">
+        <Button
+          color="primary"
+          onPress={onOpen}
+          className={`transition-transform duration-300 z-30 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        >
+          <FaArrowUp />
+        </Button>
+      </div>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="5xl">
+        <ModalContent>
+          <ModalHeader>Residential Electricity Prices</ModalHeader>
+          <ModalBody className="flex justify-center items-center">
+            <ElectricitySearch />
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      <div className="absolute bottom-4 left-4 z-30">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white-300 opacity-50 hover:opacity-100 transition-opacity duration-300">
+          TradeApollo
+        </h1>
       </div>
     </main>
   );
