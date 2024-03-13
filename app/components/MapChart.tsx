@@ -63,8 +63,8 @@ const MapChart: React.FC<MapChartProps> = ({ year }) => {
   return (
     <Map
       initialViewState={{
-        latitude: 40,
-        longitude: -100,
+        latitude: 48,
+        longitude: 15,
         zoom: 3
       }}
       mapStyle="mapbox://styles/mapbox/light-v9"
