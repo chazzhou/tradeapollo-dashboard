@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@nextui-org/react": "^2.2.9",
+    "country-flag-icons": "^1.5.9",
     "d3-scale": "^4.0.2",
     "framer-motion": "^11.0.8",
     "mapbox-gl": "^3.2.0",

@@ -1,6 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import Map, { Source, Layer } from 'react-map-gl';
 import { dataLayer } from './map-style';
+import { hasFlag } from 'country-flag-icons'
+import * as flags from 'country-flag-icons/react/3x2';
+
+interface CountryFlagProps extends React.ComponentProps<'div'> {
+  countryCode: string;
+}
+
+const CountryFlag: React.FC<CountryFlagProps> = ({ countryCode, ...props }) => {
+  const FlagComponent = flags[countryCode as keyof typeof flags];
+
+  if (!FlagComponent) {
+    return null; // or render a default flag or placeholder
+  }
+
+  return <FlagComponent {...props as React.ComponentProps<typeof FlagComponent>} />;
+};
 
 const MAPBOX_TOKEN = 'pk.eyJ1Ijoic3p6aHkwMSIsImEiOiJjbHRvdTE4czcwMzhlMmlxb3piN3AyMWRrIn0.Eofj6S2YRnai_qpFhW20Wg'; // Set your mapbox token here
 
@@ -33,6 +49,7 @@ const tooltipText = (data: any) => {
 
 const MapChart: React.FC<MapChartProps> = ({ year }) => {
   const [data, setData] = React.useState([]);
+  const [hoverInfo, setHoverInfo] = React.useState(null);
 
   useEffect(() => {
     fetch(`/co2_data/${year}.json`)
@@ -50,6 +67,19 @@ const MapChart: React.FC<MapChartProps> = ({ year }) => {
       });
   }, [year]);
 
+  const onHover = useCallback((event: any) => {
+    const {
+      features,
+      point: {x, y}
+    } = event;
+    const hoveredFeature = features && features[0];
+
+    // prettier-ignore
+    setHoverInfo(hoveredFeature && {feature: hoveredFeature, x, y});
+  }, []);
+
+  console.log(hoverInfo);
+
   return (
     <Map
       initialViewState={{
@@ -60,10 +90,22 @@ const MapChart: React.FC<MapChartProps> = ({ year }) => {
       mapStyle="mapbox://styles/mapbox/light-v9"
       mapboxAccessToken={MAPBOX_TOKEN}
       interactiveLayerIds={['data']}
+      onMouseMove={onHover}
     >
       <Source type="geojson" data={mapData}>
         <Layer {...dataLayer} />
       </Source>
+      {hoverInfo && (
+        <div className="tooltip" style={{left: (hoverInfo as any).x, top: (hoverInfo as any).y}}>
+          <div className="flex flex-row justify-start space-x-1 items-center">
+            {hasFlag((hoverInfo as any).feature.properties.countryKey) && (
+              <CountryFlag countryCode={(hoverInfo as any).feature.properties.countryKey} className="max-w-3" />
+            )}
+            <div>{(hoverInfo as any).feature.properties.countryName}</div>
+          </div>
+          <div>Electricity Zone: {(hoverInfo as any).feature.properties.zoneName}</div>
+        </div>
+      )}
     </Map>
   );
 };
