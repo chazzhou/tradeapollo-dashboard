@@ -56,7 +56,7 @@ const MapChart: React.FC = () => {
           initialViewState={{
             latitude: 48,
             longitude: 15,
-            zoom: 3
+            zoom: 4
           }}
           style={{ height: '100%', width: '100%' }}
           mapStyle="mapbox://styles/mapbox/light-v9"
