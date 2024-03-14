@@ -119,6 +119,16 @@ const FeaturePanel: React.FC<FeaturePanelProps> = ({ feature, onClose }) => {
         return null;
     };
 
+    const getIntensityVariant = (intensity: number) => {
+        if (intensity <= 50) {
+            return 'flat';
+        } else if (intensity <= 150) {
+            return 'bordered';
+        } else {
+            return 'solid';
+        }
+    };
+
     const getIntensityColor = (intensity: number) => {
         if (intensity <= 50) {
             return 'success';
@@ -147,7 +157,7 @@ const FeaturePanel: React.FC<FeaturePanelProps> = ({ feature, onClose }) => {
                         <div className="flex items-center gap-2">
                             <Chip
                                 color={getIntensityColor(carbonIntensity)}
-                                variant={(carbonIntensity)}
+                                variant={getIntensityVariant(carbonIntensity)}
                             >
                                 {carbonIntensity} gCO2eq/kWh
                             </Chip>
