@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button, Card } from '@nextui-org/react';
+import { Card, Button, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Divider } from '@nextui-org/react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import moment from 'moment';
 
@@ -12,6 +12,42 @@ interface FeaturePanelProps {
 const FeaturePanel: React.FC<FeaturePanelProps> = ({ feature, onClose }) => {
     const [priceData, setPriceData] = useState([]);
     const [selectedDate, setSelectedDate] = useState('');
+    const [carbonIntensity, setCarbonIntensity] = useState(null);
+    const [powerBreakdown, setPowerBreakdown] = useState(null);
+
+    const fetchCarbonIntensity = async (zoneName: string) => {
+        try {
+            const response = await fetch(
+                `https://api.electricitymap.org/v3/carbon-intensity/latest?zone=${zoneName}`,
+                {
+                    headers: {
+                        'auth-token': 'xgRnGUcApuUiR',
+                    },
+                }
+            );
+            const data = await response.json();
+            setCarbonIntensity(data.carbonIntensity);
+        } catch (error) {
+            console.error('Error fetching carbon intensity data:', error);
+        }
+    };
+
+    const fetchPowerBreakdown = async (zoneName: string) => {
+        try {
+            const response = await fetch(
+                `https://api.electricitymap.org/v3/power-breakdown/latest?zone=${zoneName}`,
+                {
+                    headers: {
+                        'auth-token': 'myapitoken',
+                    },
+                }
+            );
+            const data = await response.json();
+            setPowerBreakdown(data.powerConsumptionBreakdown);
+        } catch (error) {
+            console.error('Error fetching power breakdown data:', error);
+        }
+    };
 
     const fetchPriceData = async (date: string) => {
         try {
@@ -24,12 +60,14 @@ const FeaturePanel: React.FC<FeaturePanelProps> = ({ feature, onClose }) => {
             console.error('Error fetching price data:', error);
         }
     };
-    
+
     useEffect(() => {
         if (feature) {
             const currentDate = new Date().toISOString().split('T')[0];
             setSelectedDate(currentDate);
             fetchPriceData(currentDate);
+            fetchCarbonIntensity(feature.properties.zoneName);
+            fetchPowerBreakdown(feature.properties.zoneName);
         }
     }, [feature]);
 
@@ -79,6 +117,16 @@ const FeaturePanel: React.FC<FeaturePanelProps> = ({ feature, onClose }) => {
 
     if (!feature) {
         return null;
+    };
+
+    const getIntensityColor = (intensity: number) => {
+        if (intensity <= 50) {
+            return 'success';
+        } else if (intensity <= 150) {
+            return 'warning';
+        } else {
+            return 'danger';
+        }
     }
 
     return (
@@ -92,7 +140,42 @@ const FeaturePanel: React.FC<FeaturePanelProps> = ({ feature, onClose }) => {
             <div className="p-6">
                 <h2 className="text-2xl font-bold mb-4">{feature.properties.countryName}</h2>
                 <p className="mb-4">Electricity Zone: {feature.properties.zoneName}</p>
-                <div className="mb-6">
+                <Divider />
+                {carbonIntensity && (
+                    <Card className="mb-4 p-4" shadow="none">
+                        <h3>Live Carbon Intensity</h3>
+                        <div className="flex items-center gap-2">
+                            <Chip
+                                color={getIntensityColor(carbonIntensity)}
+                                variant={(carbonIntensity)}
+                            >
+                                {carbonIntensity} gCO2eq/kWh
+                            </Chip>
+                        </div>
+                    </Card>
+                )}
+                <Divider />
+                {powerBreakdown && (
+                    <Card className="mb-4 p-4" shadow="none">
+                        <h3>Live Power Breakdown</h3>
+                        <Table aria-label="Power Breakdown Table">
+                            <TableHeader>
+                                <TableColumn>Source</TableColumn>
+                                <TableColumn>Power (MW)</TableColumn>
+                            </TableHeader>
+                            <TableBody>
+                                {Object.entries(powerBreakdown).map(([source, power]) => (
+                                    <TableRow key={source}>
+                                        <TableCell>{source}</TableCell>
+                                        <TableCell>{String(power)}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </Card>
+                )}
+                <Divider />
+                <div className="mb-6 mt-8">
                     <label htmlFor="date-select" className="block font-semibold mb-2">
                         Select Date:
                     </label>
