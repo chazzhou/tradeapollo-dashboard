@@ -3,10 +3,18 @@ import { motion } from 'framer-motion';
 import { Card, Button, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Divider } from '@nextui-org/react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import moment from 'moment';
+import zonesData from './zones.json';
 
 interface FeaturePanelProps {
     feature: any;
     onClose: () => void;
+}
+
+interface ZoneData {
+    [key: string]: {
+        zoneName: string;
+        countryName?: string;
+    };
 }
 
 const FeaturePanel: React.FC<FeaturePanelProps> = ({ feature, onClose }) => {
@@ -14,6 +22,10 @@ const FeaturePanel: React.FC<FeaturePanelProps> = ({ feature, onClose }) => {
     const [selectedDate, setSelectedDate] = useState('');
     const [carbonIntensity, setCarbonIntensity] = useState(null);
     const [powerBreakdown, setPowerBreakdown] = useState(null);
+
+    const getZoneName = (zoneId: string) => {
+        return (zonesData as ZoneData)[zoneId]?.zoneName ?? zoneId;
+    };
 
     const fetchCarbonIntensity = async (zoneName: string) => {
         try {
@@ -149,7 +161,7 @@ const FeaturePanel: React.FC<FeaturePanelProps> = ({ feature, onClose }) => {
         >
             <div className="p-6">
                 <h2 className="text-2xl font-bold mb-4">{feature.properties.countryName}</h2>
-                <p className="mb-4">Electricity Zone: {feature.properties.zoneName}</p>
+                <p className="mb-4">Electricity Zone: {getZoneName(feature.properties.zoneName)} | {feature.properties.countryKey}</p>
                 <Divider />
                 {carbonIntensity && (
                     <Card className="mb-4 p-4" shadow="none">
