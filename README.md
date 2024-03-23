@@ -62,7 +62,7 @@ npm run dev
 
 The TradeApollo application relies on the following API endpoints:
 
-- Residential Electricity Prices: `https://frankfurt.corles.net/electricity`
+- Residential Electricity Prices: You need to run the backend API program.
 - Carbon Intensity Data: `https://api.electricitymap.org/v3/carbon-intensity/latest`
 - Power Breakdown Data: `https://api.electricitymap.org/v3/power-breakdown/latest`
 - Historical Pricing Data: You need to run the backend API program.
