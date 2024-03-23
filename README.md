@@ -1,6 +1,6 @@
-# TradeApollo
+# TradeApollo Dsahboard
 
-TradeApollo is a Next.js-based dashboard application that allows users to explore residential electricity prices and carbon intensity data across different countries and regions. The application utilizes various APIs to fetch real-time data and provides an interactive map interface for easy navigation.
+TradeApollo Dashboard is a Next.js-based dashboard application that allows users to explore residential electricity prices and carbon intensity data across different countries and regions. The application utilizes various APIs to fetch real-time data and provides an interactive map interface for easy navigation.
 
 ## Features
 
